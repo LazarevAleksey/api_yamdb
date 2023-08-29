@@ -50,7 +50,7 @@ class User(AbstractUser):
         ]
 
     def __str__(self):
-        return f'Пользователь: {self.username}'
+        return self.username
 
     @property
     def is_user(self):
@@ -59,7 +59,7 @@ class User(AbstractUser):
 
 class Category(models.Model):
     name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, max_length=50)
 
     def __str__(self):
         return self.name
@@ -67,7 +67,7 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, max_length=50)
 
     def __str__(self):
         return self.name
@@ -75,40 +75,45 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True)
+    # slug = models.SlugField(unique=True, null=False, blank=False)
     year = models.IntegerField()
-    rating = models.IntegerField()
+    rating = models.IntegerField(null=True, blank=True)
     description = models.TextField(blank=True)
-    genre = models.ForeignKey(
+    genre = models.ManyToManyField(
         Genre,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='genre'
+        through='TitleGenre'
     )
     category = models.ForeignKey(
         Category,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='category'
+        # null=False, blank=False,
+        # null=True, blank=True,
+        on_delete=models.CASCADE,
+        related_name='title'
     )
 
     def __str__(self):
         return self.name
+        # return f'{self.name} {self.slug}'
+
+
+class TitleGenre(models.Model):
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.genre} {self.title}'
 
 
 class Review(models.Model):
-    text = models.CharField(max_length=256)
+    text = models.CharField(max_length=256, unique=True)
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='review',
+        related_name='author_review',
         verbose_name='Автор отзыва',
     )
     score = models.IntegerField(choices=CHOICES)
-    pub_date = models.DateTimeField(
-        'Дата публикации отзыва',
-        auto_now_add=True
-    ),
+    pub_date = models.DateTimeField('pub_date', auto_now_add=True)
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -118,7 +123,7 @@ class Review(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['text', 'author'],
+                fields=['title', 'author'],
                 name='unique_follow'
             )
         ]

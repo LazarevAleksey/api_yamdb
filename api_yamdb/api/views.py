@@ -11,7 +11,9 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import (CategorySerializer, SignUpSerializer,
-                          MyTokenObtainPairSerializer, UserSerializer, UserMeSerializer)
+                          MyTokenObtainPairSerializer, UserSerializer,
+                          UserMeSerializer, GenreSerializer, TitleSerializer,
+                          CommentSerializer, ReviewSerializer, CategorySecondSerializer)
 from .permissions import IsAuthorOrReadOnlyPermission, AdminOrReadOnly
 from reviews.models import User, Category, Genre, Title, Review, Comment
 
@@ -32,11 +34,61 @@ def conformation_send_mail(data):
     )
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
     permission_classes = (IsAuthorOrReadOnlyPermission,)
     pagination_class = LimitOffsetPagination
+
+    def get_review(self):
+        return get_object_or_404(Review, id=self.kwargs.get('review_id'))
+
+    def perform_create(self, serializer):
+        return serializer.save(author=self.request.user, review=self.get_review())
+
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+    permission_classes = (IsAuthorOrReadOnlyPermission,)
+    pagination_class = LimitOffsetPagination
+
+    def get_title(self):
+        # print(f"ff_: {get_object_or_404(Title, id=self.kwargs.get('title_id'))}")
+        return get_object_or_404(Title, id=self.kwargs.get('title_id'))
+
+    def get_queryset(self):
+        # print(f"dd_: {self.get_title().review.all()}")
+        return self.get_title().review.all()
+
+    def perform_create(self, serializer):
+        return serializer.save(author=self.request.user, title=self.get_title())
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySecondSerializer
+    permission_classes = (IsAuthorOrReadOnlyPermission,)
+    pagination_class = LimitOffsetPagination
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = (IsAuthorOrReadOnlyPermission,)
+    pagination_class = LimitOffsetPagination
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = (IsAuthorOrReadOnlyPermission,)
+    pagination_class = LimitOffsetPagination
+
+    # def get_serializer_class(self):
+    #     if self.action == 'create':
+    #         return TitlePostSerializer
+    #     return TitleSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -52,6 +104,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return get_object_or_404(User, username=username)
 
     def perform_create(self, serializer):
+        genre = serializer.validated_data.get('genre')
         res = serializer.save()
         if self.request.method == 'POST':
             user = User.objects.get(username=serializer.data['username'])

@@ -31,12 +31,17 @@ class AdminOrReadOnly(permissions.IsAuthenticated):
 class IsAuthorOrReadOnlyPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        print(f'user: {request.user}')
+        # print(f'user: {request.user}')
         return (request.method in permissions.SAFE_METHODS
                 or request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
+        # print(f'request.user.is_user_: {request.user.is_user}')
         res = (request.method in permissions.SAFE_METHODS
-               or request.user.is_user)
-        logger.debug(f'Request: {request.user.is_user} __ {res} ')
+            or (request.method == 'PATCH' or 'DELETE'
+                                           and (
+                                                   obj.author == request.user
+                                                   or request.user.role == 'moderator'
+                                                   or request.user.role == 'admin')))
+        # logger.debug(f'Request: {request.user.is_user} __ {res} ')
         return res

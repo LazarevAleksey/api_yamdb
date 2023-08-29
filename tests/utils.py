@@ -218,13 +218,32 @@ def create_titles(admin_client):
     categories = create_categories(admin_client)
     result = []
     data = {
-        'name': 'Терминатор',
-        'year': 1984,
-        'genre': [genres[0]['slug'], genres[1]['slug']],
-        'category': categories[0]['slug'],
-        'description': 'I`ll be back'
+        "name": "Терминатор",
+        "year": 1984,
+        "genre": [genres[0]['slug'], genres[1]['slug']],
+        "category": categories[0]['slug'],
+        "description": "I`ll be back"
     }
-    response = admin_client.post('/api/v1/titles/', data=data)
+    # print(f"genre_: {data['genre']}, category_: {data['category']}, data_: {data}")
+    print(f'test_data_: {data}')
+    # response = admin_client.post('/api/v1/titles/', data=data)
+    #response_v = admin_client.get('/api/v1/genres/')
+    #print(f'resp_: {response_v}')
+    #print(f'resp_V.sjson_: {response_v.json()}')
+    # response_t = admin_client.get('/api/v1/titles/')
+    # print(f'resp_t: {response_t}')
+    # print(f'resp_t.json_: {response_t.json()}')
+    response = admin_client.post('/api/v1/titles/', data=data
+        # {
+        #     "name": "Терминатор",
+        #     "year": 1984,
+        #     "genre": ["horror", "comedy"],
+        #     "category": "films",
+        #     "description": "I`ll be back"
+        # }
+    )
+    print(f'response_: {response.json()}')
+    # print(f'response.status_code_: {response.status_code}')
     assert response.status_code == HTTPStatus.CREATED, (
         'Если POST-запрос администратора к `/api/v1/titles/` содержит '
         'корректные данные - должен вернуться ответ со статусом 201.'

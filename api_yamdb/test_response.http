@@ -1,0 +1,18 @@
+# пример GET запроса
+# GET https://jsonplaceholder.typicode.com/posts/1
+
+#__Titles_GET
+# GET http://127.0.0.1:8000/api/v1/titles/
+
+#__Titles_Post
+POST http://127.0.0.1:8000/api/v1/titles/ 
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjkzOTAxNDk1LCJqdGkiOiJlYjc2YjU3NDRkNjg0ZjJmOTZlY2M4MDcwYTYxYmIzZiIsInVzZXJfaWQiOjY5fQ.zTMT1PDwTSfwWTNcf7PT3A84ZBFiF4yowanhcOCFGUI
+
+{
+
+    "year": 1984,
+    "genre": ["horror", "comedy"],
+    "category": "films",
+    "description": "I`ll be back"
+}
