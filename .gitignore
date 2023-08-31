@@ -148,3 +148,10 @@ dmypy.json
 # папки со статикой и медиа
 media/
 
+# Only for Development only
+*/migrations/*
+**/migrations/
+**/reviews/migrations/**
+!**/migrations
+!**/migrations/__init__.py
+

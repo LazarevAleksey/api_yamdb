@@ -83,20 +83,17 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = ('name', 'slug')
     
 
-
 class GenreSecondSerializer(serializers.ModelSerializer):
-
-
-    # def to_internal_value(self, data):
-    #     try:
-    #         data = get_object_or_404(Genre, slug=data)
-    #         data = {'name': data.name, 'slug': data.slug}
-    #     except ValueError:
-    #         raise serializers.ValidationError('Неверный формат поля "genre"')
-    #     return data
-    def validate_genre(self, value):
-        print(f'validate_genre_: {value}')
-        return value
+    def to_internal_value(self, data):
+        try:
+            data = get_object_or_404(Genre, slug=data)
+            data = {'name': data.name, 'slug': data.slug}
+        except ValueError:
+            raise serializers.ValidationError('Неверный формат поля "genre"')
+        return data
+    # def validate_genre(self, value):
+    #     print(f'validate_genre_: {value}')
+    #     return value
 
     class Meta:
         model = Genre
